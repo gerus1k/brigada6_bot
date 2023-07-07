@@ -12,7 +12,7 @@ def start(message):
     btn1 = types.KeyboardButton("🇷🇺 Русский")
     btn2 = types.KeyboardButton('🇬🇧 English')
     markup.add(btn1, btn2)
-    bot.send_message(message.from_user.id, "🇷🇺 Выберите язык / 🇬🇧 Choose your language", reply_markup=markup)
+    bot.send_message(message.from_user.id, "sdsd 🇷🇺 Выберите язык / 🇬🇧 Choose your language", reply_markup=markup)
 
 
 bot.polling(none_stop=True, interval=0)
