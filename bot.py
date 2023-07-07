@@ -7,6 +7,9 @@ from googletrans import Translator
 bot = telebot.TeleBot('6022109518:AAHgixLTjERH8Caogmg_lsz1v2y5D38iNIg')
 translator = Translator()
 
+# Хранение состояний пользователя (какой функцией сейчас пользуется)
+user_states = {}
+
 # Выбор языка при вызове /start
 @bot.message_handler(commands=['start'])
 def start(message):
@@ -20,10 +23,11 @@ def start(message):
 # Обработка выбора функции переводчика
 @bot.callback_query_handler(func=lambda call: call.data == 'translator')
 def translator_callback(call):
+    user_states[call.from_user.id] = 'translator'
     bot.send_message(call.message.chat.id, 'Введите текст для перевода:')
 
 # Обработка ввода текста для перевода (НЕ РАБОТАЕТ)) )
-@bot.message_handler(func=lambda message: True)
+@bot.message_handler(func=lambda message: user_states.get(message.from_user.id) == 'translator')
 def translate_text(message):
     text = message.text
     try:
@@ -38,6 +42,27 @@ def translate_text(message):
         bot.send_message(message.chat.id, 'Не удалось определить язык текста. Пожалуйста, попробуйте еще раз.')
     except Exception as e:
         bot.send_message(message.chat.id, f'Произошла ошибка: {str(e)}')
+
+    user_states[message.from_user.id] = None
+
+# Обработка выбора функции калькулятора
+@bot.callback_query_handler(func=lambda call: call.data == 'calculator')
+def calculator_callback(call):
+    user_states[call.from_user.id] = 'calculator'  # Установка состояния
+    bot.send_message(call.message.chat.id, 'Введите выражение для вычисления:')
+
+# Обработка ввода выражения для калькулятора
+@bot.message_handler(func=lambda message: user_states.get(message.from_user.id) == 'calculator')
+def calculate_expression(message):
+    expression = message.text
+    try:
+        result = eval(expression)
+        bot.send_message(message.chat.id, f'Результат: {result}')
+    except Exception as e:
+        bot.send_message(message.chat.id, f'Произошла ошибка при вычислении выражения: {str(e)}')
+
+    # Сброс состояния
+    user_states[message.from_user.id] = None
 
 # Выводим основной интерфейс бота в зависимости от выбранного языка
 @bot.callback_query_handler(func=lambda call: True)
