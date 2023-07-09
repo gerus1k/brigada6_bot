@@ -1,11 +1,13 @@
 import telebot
 import googletrans
+import requests
 
 from telebot import types
 from googletrans import Translator
 
 bot = telebot.TeleBot('6022109518:AAHgixLTjERH8Caogmg_lsz1v2y5D38iNIg')
 translator = Translator()
+weather_api_key = 'abc243dccda528959fc3d2dd6f8ab61a'
 
 # Хранение состояний пользователя (какой функцией сейчас пользуется)
 user_states = {}
@@ -62,6 +64,39 @@ def calculate_expression(message):
         bot.send_message(message.chat.id, f'Произошла ошибка при вычислении выражения: {str(e)}')
 
     # Сброс состояния
+    user_states[message.from_user.id] = None
+
+# Обработка выбора функции погоды
+@bot.callback_query_handler(func=lambda call: call.data == 'weather')
+def weather_callback(call):
+    user_states[call.from_user.id] = 'weather'
+    bot.send_message(call.message.chat.id, 'Введите город:')
+
+# Обработка выбранного населенного пункта и вывод погоды
+@bot.message_handler(func=lambda message: user_states.get(message.from_user.id) == 'weather')
+def get_weather(message):
+    city = message.text
+    try:
+        url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}&units=metric'
+        response = requests.get(url).json()
+        if response['cod'] == 200:
+            weather_data = response['weather'][0]
+            main = weather_data['main']
+            description = weather_data['description']
+            temperature = response['main']['temp']
+            humidity = response['main']['humidity']
+            wind_speed = response['wind']['speed']
+            bot.send_message(message.chat.id, f'Погода в городе {city}:\n'
+                                              f'Основные условия: {main}\n'
+                                              f'Описание: {description}\n'
+                                              f'Температура: {temperature}°C\n'
+                                              f'Влажность: {humidity}%\n'
+                                              f'Скорость ветра: {wind_speed} м/с')
+        else:
+            bot.send_message(message.chat.id, 'Не удалось получить данные о погоде для указанного города.')
+    except Exception as e:
+        bot.send_message(message.chat.id, f'Произошла ошибка: {str(e)}')
+
     user_states[message.from_user.id] = None
 
 # Выводим основной интерфейс бота в зависимости от выбранного языка
