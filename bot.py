@@ -1,6 +1,7 @@
 import telebot
 import googletrans
 import requests
+import random
 
 from telebot import types
 from googletrans import Translator
@@ -8,6 +9,7 @@ from googletrans import Translator
 bot = telebot.TeleBot('6022109518:AAHgixLTjERH8Caogmg_lsz1v2y5D38iNIg')
 translator = Translator()
 weather_api_key = 'abc243dccda528959fc3d2dd6f8ab61a'
+meme_api_url = "https://programming-memes-images.p.rapidapi.com/v1/memes?rapidapi-key=1db773f93dmsh3e0725f197b19f6p19106bjsn5b1f8177ea85"
 
 # Хранение состояний пользователя (какой функцией сейчас пользуется)
 user_states = {}
@@ -98,6 +100,20 @@ def get_weather(message):
         bot.send_message(message.chat.id, f'Произошла ошибка: {str(e)}')
 
     user_states[message.from_user.id] = None
+
+# Обработка IT-мемчик дня
+@bot.callback_query_handler(func=lambda call: call.data == 'meme')
+def meme_callback(call):
+    try:
+        response = requests.get(meme_api_url).json()
+        if response and isinstance(response, list) and len(response) > 0:
+            images = [mem.get("image") for mem in response]
+            random_image = random.choice(images)
+            bot.send_photo(call.message.chat.id, random_image)
+        else:
+            bot.send_message(call.message.chat.id, 'Не удалось получить IT-мем дня.')
+    except Exception as e:
+        bot.send_message(call.message.chat.id, f'Произошла ошибка: {str(e)}')
 
 # Выводим основной интерфейс бота в зависимости от выбранного языка
 @bot.callback_query_handler(func=lambda call: True)
