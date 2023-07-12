@@ -32,7 +32,7 @@ trans_ru = types.KeyboardButton('🌐 Переводчик')
 calc_ru = types.KeyboardButton('🧮 Калькулятор')
 weather_ru = types.KeyboardButton('🌡️ Погода')
 meme_ru = types.KeyboardButton('🗿 IT мем дня')
-settings_ru = types.KeyboardButton('🔙 Вернуться к выбору языка')
+settings_ru = types.KeyboardButton('⚙️ Настройки')
 menu_keyboard_ru.add(trans_ru, calc_ru, weather_ru, meme_ru, settings_ru)
 
 menu_keyboard_en = types.ReplyKeyboardMarkup(row_width=2)
@@ -40,7 +40,7 @@ translator_en = types.KeyboardButton('🌐 Translator')
 calc_en = types.KeyboardButton('🧮 Calculator')
 weather_en = types.KeyboardButton('🌡️ Weather')
 meme_en = types.KeyboardButton('🗿 IT-meme of the day')
-settings_en = types.KeyboardButton('🔙 Get back to language select')
+settings_en = types.KeyboardButton('⚙️ Settings')
 menu_keyboard_en.add(translator_en, calc_en, weather_en, meme_en, settings_en)
 
 in_keyboard_ru = types.ReplyKeyboardMarkup(row_width=2)
@@ -56,10 +56,10 @@ in_keyboard_en.add(back_to_menu_en)
 @bot.message_handler(commands=['start'])
 def start(message):
 
-    bot.send_message(message.chat.id, '✋😃Выберите язык / Choose language:', reply_markup=lang_keyboard)
+    bot.send_message(message.chat.id, '✋😃 Выберите язык / Choose language', reply_markup=lang_keyboard)
 
 
-# bot main
+# bot functions
 @bot.message_handler(content_types=['text'])
 def main(message):
 
@@ -68,12 +68,12 @@ def main(message):
     if message.text == '🇷🇺Русский':
         state = 'ru_menu'
         language = 'ru'
-        bot.send_message(message.chat.id, 'Выберите функцию: ', reply_markup=menu_keyboard_ru)
+        bot.send_message(message.chat.id, '👇🏻 Выберите функцию: ', reply_markup=menu_keyboard_ru)
         state = None
     elif message.text == '🇬🇧English':
         state = 'en_menu'
         language = 'en'
-        bot.send_message(message.chat.id, 'Choose function: ', reply_markup=menu_keyboard_en)
+        bot.send_message(message.chat.id, '👇🏻 Choose function: ', reply_markup=menu_keyboard_en)
         state = None
 
     # it meme of the day
@@ -87,9 +87,9 @@ def main(message):
                 random_image = random.choice(images)
                 bot.send_photo(message.chat.id, random_image)
             elif language == 'ru':
-                bot.send_message(message.chat.id, 'Не удалось получить IT-мем дня.')
+                bot.send_message(message.chat.id, '⛔ Не удалось получить IT-мем дня.')
             elif language == 'en':
-                bot.send_message(message.chat.id, "Couldn't get It meme of the day.")
+                bot.send_message(message.chat.id, "⛔ Couldn't get It meme of the day.")
         except Exception as e:
             bot.send_message(message.chat.id, f'Error: {str(e)}')
         state = None
@@ -106,7 +106,7 @@ def main(message):
 
     # weather conditions
 
-    elif state == 'weather' and type(message.text) is str:
+    elif state == 'weather' and type(message.text) is str and '🔙' not in message.text:
         city = message.text
         try:
             url = f'https://api.openweathermap.org/data/2.5/weather?q={city}&appid={weather_api_key}&units=metric'
@@ -135,11 +135,11 @@ def main(message):
                                                       f'Humidity: {humidity}%\n'
                                                       f'Wind speed: {wind_speed} м/с')
             elif language == 'ru':
-                bot.send_message(message.chat.id, 'Не удалось получить данные о погоде для указанного города.')
+                bot.send_message(message.chat.id, '⛔ Не удалось получить данные о погоде для указанного города.')
             elif language == 'en':
-                bot.send_message(message.chat.id, "Couldn't get data for this city.")
+                bot.send_message(message.chat.id, "⛔ Couldn't get data for this city.")
         except Exception as e:
-            bot.send_message(message.chat.id, f'Error: {str(e)}')
+            bot.send_message(message.chat.id, f'⛔ Error: {str(e)}')
         state = None
 
     # entering the text
@@ -153,7 +153,7 @@ def main(message):
 
     # translator
 
-    elif state == 'trans' and type(message.text) is str:
+    elif state == 'trans' and type(message.text) is str and '🔙' not in message.text:
         text = message.text
         try:
             detected_lang = translator.detect(text).lang
@@ -171,11 +171,11 @@ def main(message):
                     bot.send_message(message.chat.id, f'Перевод на русский: {translation.text}')
         except AttributeError:
             if language == 'en':
-                bot.send_message(message.chat.id, "Couldn't recognize the text language. Please try again.")
+                bot.send_message(message.chat.id, "⛔ Couldn't recognize the text language. Please try again.")
             elif language == 'ru':
-                bot.send_message(message.chat.id, 'Не удалось определить язык текста. Пожалуйста, попробуйте еще раз.')
+                bot.send_message(message.chat.id, '⛔ Не удалось определить язык текста. Пожалуйста, попробуйте еще раз')
         except Exception as e:
-            bot.send_message(message.chat.id, f'Error: {str(e)}')
+            bot.send_message(message.chat.id, f'⛔ Error: {str(e)}')
         state = None
 
     # enter expression
@@ -189,7 +189,7 @@ def main(message):
 
     # calculator
 
-    elif state == 'calc':
+    elif state == 'calc' and '🔙' not in message.text:
         expression = message.text
         try:
             result = eval(expression)
@@ -198,7 +198,23 @@ def main(message):
             elif language == 'ru':
                 bot.send_message(message.chat.id, f'Результат : {result}')
         except Exception as e:
-            bot.send_message(message.chat.id, f'Error : {str(e)}')
+            bot.send_message(message.chat.id, f'⛔ Error : {str(e)}')
+
+    # settings
+
+    elif '⚙️' in message.text:
+        state = 'settings'
+        bot.send_message(message.chat.id, '⚙️ Выберите язык / Choose language', reply_markup=lang_keyboard)
+
+    # back to menu
+
+    elif '🔙' in message.text:
+        if language == 'ru':
+            state = 'ru_menu'
+            bot.send_message(message.chat.id, 'Выберите функцию: ', reply_markup=menu_keyboard_ru)
+        elif language == 'en':
+            state = 'en_menu'
+            bot.send_message(message.chat.id, 'Choose function: ', reply_markup=menu_keyboard_en)
 
 
 bot.polling(none_stop=True, interval=0)
