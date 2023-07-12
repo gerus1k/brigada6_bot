@@ -22,12 +22,12 @@ text = None
 
 # keyboard button sets
 
-lang_keyboard = types.ReplyKeyboardMarkup()
+lang_keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
 ru_lang = types.KeyboardButton('🇷🇺Русский')
 en_lang = types.KeyboardButton('🇬🇧English')
 lang_keyboard.add(ru_lang, en_lang)
 
-menu_keyboard_ru = types.ReplyKeyboardMarkup(row_width=2)
+menu_keyboard_ru = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
 trans_ru = types.KeyboardButton('🌐 Переводчик')
 calc_ru = types.KeyboardButton('🧮 Калькулятор')
 weather_ru = types.KeyboardButton('🌡️ Погода')
@@ -35,7 +35,7 @@ meme_ru = types.KeyboardButton('🗿 IT мем дня')
 settings_ru = types.KeyboardButton('⚙️ Настройки')
 menu_keyboard_ru.add(trans_ru, calc_ru, weather_ru, meme_ru, settings_ru)
 
-menu_keyboard_en = types.ReplyKeyboardMarkup(row_width=2)
+menu_keyboard_en = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
 translator_en = types.KeyboardButton('🌐 Translator')
 calc_en = types.KeyboardButton('🧮 Calculator')
 weather_en = types.KeyboardButton('🌡️ Weather')
@@ -43,11 +43,11 @@ meme_en = types.KeyboardButton('🗿 IT-meme of the day')
 settings_en = types.KeyboardButton('⚙️ Settings')
 menu_keyboard_en.add(translator_en, calc_en, weather_en, meme_en, settings_en)
 
-in_keyboard_ru = types.ReplyKeyboardMarkup(row_width=2)
+in_keyboard_ru = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
 back_to_menu_ru = types.KeyboardButton('🔙 Вернуться в меню')
 in_keyboard_ru.add(back_to_menu_ru)
 
-in_keyboard_en = types.ReplyKeyboardMarkup(row_width=2)
+in_keyboard_en = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
 back_to_menu_en = types.KeyboardButton('🔙 Get back to menu')
 in_keyboard_en.add(back_to_menu_en)
 
