@@ -1,5 +1,4 @@
 import telebot
-import googletrans
 import requests
 import random
 
@@ -16,8 +15,6 @@ city = None
 state = None
 text = None
 
-# Хранение состояний пользователя (какой функцией сейчас пользуется)
-user_states = {}
 
 # language select after /start cmd
 @bot.message_handler(commands=['start'])
@@ -29,35 +26,16 @@ def start(message):
 
     bot.send_message(message.chat.id, 'Выберите язык / Choose language:', reply_markup=markup)
 
-# Обработка выбора функции калькулятора
-@bot.callback_query_handler(func=lambda call: call.data == 'calculator')
-def calculator_callback(call):
-    user_states[call.from_user.id] = 'calculator'  # Установка состояния
-    bot.send_message(call.message.chat.id, 'Введите выражение для вычисления:')
 
-# Обработка ввода выражения для калькулятора
-@bot.message_handler(func=lambda message: user_states.get(message.from_user.id) == 'calculator')
-def calculate_expression(message):
-    expression = message.text
-    try:
-        result = eval(expression)
-        bot.send_message(message.chat.id, f'Результат: {result}')
-    except Exception as e:
-        bot.send_message(message.chat.id, f'Произошла ошибка при вычислении выражения: {str(e)}')
-
-    # Сброс состояния
-    user_states[message.from_user.id] = None
-
-# main menu
+# bot main
 @bot.message_handler(content_types=['text'])
-def menu(message):
+def main(message):
     markup = types.ReplyKeyboardMarkup(row_width=2)
     global language, city, state, text
     # language selection
     if message.text == '🇷🇺Русский':
         state = 'ru_menu'
         language = 'ru'
-        # markup = types.InlineKeyboardMarkup(row_width=2)
 
         btn1 = types.KeyboardButton('🌐 Переводчик')
         btn2 = types.KeyboardButton('🧮 Калькулятор')
@@ -71,7 +49,6 @@ def menu(message):
     elif message.text == '🇬🇧English':
         state = 'en_menu'
         language = 'en'
-        # markup = types.InlineKeyboardMarkup(row_width=2)
 
         translator_button = types.KeyboardButton('🌐 Translator')
         calculator_button = types.KeyboardButton('🧮 Calculator')
@@ -151,12 +128,6 @@ def menu(message):
             bot.send_message(message.chat.id, f'Результат: {result}')
         except Exception as e:
             bot.send_message(message.chat.id, f'Произошла ошибка при вычислении выражения: {str(e)}')
-
-
-
-
-
-
 
 
 bot.polling(none_stop=True, interval=0)
